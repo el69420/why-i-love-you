@@ -1,0 +1,69 @@
+backend:
+  name: github
+  repo: el69420/why-i-love-you
+  branch: main
+  auth_type: pkce
+  app_id: REPLACE_WITH_YOUR_CLIENT_ID
+
+site_url: https://el69420.github.io/why-i-love-you
+display_url: https://el69420.github.io/why-i-love-you
+
+media_folder: public/images
+public_folder: /why-i-love-you/images
+
+collections:
+  - name: pages
+    label: Cards
+    label_singular: Card
+    folder: src/content/pages
+    create: true
+    delete: true
+    slug: "{{slug}}"
+    summary: "{{title}} ({{kind}})"
+    sortable_fields: ["order", "title"]
+    fields:
+      - label: Title
+        name: title
+        widget: string
+        hint: "Shown on the card — keep it short and sweet"
+
+      - label: Style
+        name: kind
+        widget: select
+        options:
+          - { label: "Yellow sticky note", value: sticky-yellow }
+          - { label: "Pink sticky note", value: sticky-rose }
+          - { label: "Blue sticky note", value: sticky-blue }
+          - { label: "Green sticky note", value: sticky-sage }
+          - { label: "Peach sticky note", value: sticky-peach }
+          - { label: "Ruled note (white)", value: note }
+          - { label: "Letter card (cream)", value: letter }
+          - { label: "Blue tape strip", value: washi-blue }
+          - { label: "Green tape strip", value: washi-sage }
+          - { label: "Peach tape strip", value: washi-peach }
+          - { label: "Rose tape strip", value: washi-rose }
+        hint: "What the card looks like"
+
+      - label: Content
+        name: body
+        widget: text
+        hint: "The main text — for tape strips this shows on hover"
+
+      - label: Tag (optional)
+        name: tag
+        widget: string
+        required: false
+        hint: "Small text shown below the card, like a date or label"
+
+      - label: Order
+        name: order
+        widget: number
+        required: false
+        hint: "Lower numbers appear first. Leave blank to add at the end."
+
+      - label: Wide (spans 2 columns)
+        name: wide
+        widget: boolean
+        required: false
+        default: false
+        hint: "Makes the card wider — good for longer letters or final notes"
