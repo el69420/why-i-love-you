@@ -1,7 +1,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --font-hand: 'Caveat', cursive;
+  --font-hand: 'Architects Daughter', cursive;
   --cream: #f5ead6;
   --ink: #2a1a08;
   --ink-faded: #5a3e22;
