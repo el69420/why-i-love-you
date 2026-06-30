@@ -3,7 +3,7 @@ backend:
   repo: el69420/why-i-love-you
   branch: main
   auth_type: pkce
-  app_id: REPLACE_WITH_YOUR_CLIENT_ID
+  app_id: Ov23licGn2gz6PiALzSd
 
 site_url: https://el69420.github.io/why-i-love-you
 display_url: https://el69420.github.io/why-i-love-you
