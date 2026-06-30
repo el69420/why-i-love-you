@@ -1,11 +1,648 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Edit — For Antero</title>
-  </head>
-  <body>
-    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
-  </body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit — For Antero</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #f5ead6;
+      --ink: #2a1a08;
+      --muted: #9a7a50;
+      --rose: #c9605a;
+      --rose-light: #fecdd3;
+      --bg: #1a1208;
+      --card: #fefcf5;
+      --border: rgba(180,150,100,0.3);
+      --font: 'Caveat', cursive;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      font-size: 1rem;
+    }
+
+    /* ── Login screen ── */
+    #login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .login-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 40px 44px;
+      max-width: 460px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .login-card h1 {
+      font-size: 2rem;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+    .login-card p {
+      color: var(--muted);
+      font-size: 1.05rem;
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+    .login-card a { color: var(--rose); }
+    .field { margin-bottom: 20px; }
+    .field label {
+      display: block;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .field input, .field select, .field textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 4px;
+      font-family: var(--font);
+      font-size: 1.05rem;
+      background: #fffdf7;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 150ms;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus {
+      border-color: var(--rose);
+    }
+    .field textarea { min-height: 100px; resize: vertical; }
+    .field .hint {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 5px;
+      opacity: 0.8;
+    }
+    .btn {
+      display: inline-block;
+      padding: 10px 24px;
+      border-radius: 4px;
+      font-family: var(--font);
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: opacity 150ms, transform 100ms;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: var(--rose); color: #fff; }
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1.5px solid var(--border);
+    }
+    .btn-ghost:hover { border-color: var(--rose); color: var(--rose); }
+    .btn-danger { background: #dc2626; color: #fff; font-size: 0.95rem; padding: 6px 14px; }
+    .btn-danger:hover { opacity: 0.85; }
+    .btn-sm { padding: 6px 16px; font-size: 0.95rem; }
+
+    /* ── App shell ── */
+    #app { display: none; min-height: 100vh; }
+    .topbar {
+      background: #120c04;
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .topbar-title {
+      font-size: 1.3rem;
+      color: #c8a060;
+      font-weight: 700;
+    }
+    .topbar-actions { display: flex; gap: 12px; align-items: center; }
+    .topbar a {
+      font-size: 0.95rem;
+      color: var(--muted);
+      text-decoration: none;
+    }
+    .topbar a:hover { color: #c8a060; }
+
+    .main { max-width: 820px; margin: 0 auto; padding: 40px 24px; }
+
+    /* ── Card list ── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .section-header h2 {
+      font-size: 1.6rem;
+      color: var(--cream);
+    }
+
+    .card-list { display: flex; flex-direction: column; gap: 12px; }
+    .card-row {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .card-row-info { flex: 1; min-width: 0; }
+    .card-row-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--ink);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card-row-kind {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .card-row-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+    /* ── Kind badge ── */
+    .kind-badge {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border-radius: 3px;
+      margin-right: 6px;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+    .badge-sticky-yellow { background: #fef08a; }
+    .badge-sticky-rose   { background: #fecdd3; }
+    .badge-sticky-blue   { background: #bae6fd; }
+    .badge-sticky-sage   { background: #bbf7d0; }
+    .badge-sticky-peach  { background: #fed7aa; }
+    .badge-note          { background: #fefefe; border: 1px solid #ddd; }
+    .badge-letter        { background: #fefcf5; border: 1px solid #d4b896; }
+    .badge-washi-blue    { background: #a8c4d4; }
+    .badge-washi-sage    { background: #a8c4a8; }
+    .badge-washi-peach   { background: #e8b890; }
+    .badge-washi-rose    { background: #e8a0a0; }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100; padding: 24px;
+      display: none;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--card);
+      border-radius: 8px;
+      padding: 36px 40px;
+      max-width: 540px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+    }
+    .modal h2 {
+      font-size: 1.6rem;
+      color: var(--ink);
+      margin-bottom: 24px;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 28px;
+      flex-wrap: wrap;
+    }
+
+    /* ── Status toast ── */
+    #toast {
+      position: fixed;
+      bottom: 28px; left: 50%; transform: translateX(-50%);
+      background: #1a1208;
+      color: #c8a060;
+      border: 1px solid rgba(200,160,96,0.3);
+      border-radius: 6px;
+      padding: 12px 24px;
+      font-size: 1.05rem;
+      opacity: 0;
+      transition: opacity 250ms;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 200;
+    }
+    #toast.show { opacity: 1; }
+
+    .empty-state {
+      text-align: center;
+      color: var(--cream);
+      opacity: 0.4;
+      padding: 60px 0;
+      font-size: 1.2rem;
+    }
+
+    .loading {
+      text-align: center;
+      color: var(--cream);
+      opacity: 0.5;
+      padding: 40px 0;
+      font-size: 1.1rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Login -->
+<div id="login-screen">
+  <div class="login-card">
+    <h1>✏️ Edit</h1>
+    <p>
+      Enter a GitHub Personal Access Token to edit the site.<br>
+      <a href="https://github.com/settings/tokens/new?scopes=repo&description=Why+I+Love+You+CMS" target="_blank">
+        Generate one here
+      </a> — tick the <strong>repo</strong> scope, then paste it below.
+    </p>
+    <div class="field">
+      <label>Personal Access Token</label>
+      <input type="password" id="token-input" placeholder="ghp_..." autocomplete="off" />
+      <div class="hint">Stored only in this browser. Never sent anywhere except GitHub.</div>
+    </div>
+    <button class="btn btn-primary" id="login-btn">Sign in</button>
+    <div id="login-error" style="color:#dc2626;margin-top:14px;font-size:1rem;display:none"></div>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-title">✏️ Edit — For Antero</div>
+    <div class="topbar-actions">
+      <a href="/why-i-love-you/" target="_blank">← View site</a>
+      <button class="btn btn-ghost btn-sm" id="logout-btn">Sign out</button>
+    </div>
+  </div>
+  <div class="main">
+    <div class="section-header">
+      <h2>Cards</h2>
+      <button class="btn btn-primary" id="new-btn">+ Add card</button>
+    </div>
+    <div id="card-list" class="card-list">
+      <div class="loading">Loading…</div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit/New Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h2 id="modal-title">New card</h2>
+    <div class="field">
+      <label>Title</label>
+      <input type="text" id="f-title" placeholder="bom diaaaa ☀️" />
+      <div class="hint">Shown on the card. Keep it short.</div>
+    </div>
+    <div class="field">
+      <label>Style</label>
+      <select id="f-kind">
+        <option value="sticky-yellow">Yellow sticky note</option>
+        <option value="sticky-rose">Pink sticky note</option>
+        <option value="sticky-blue">Blue sticky note</option>
+        <option value="sticky-sage">Green sticky note</option>
+        <option value="sticky-peach">Peach sticky note</option>
+        <option value="note">Ruled note (white)</option>
+        <option value="letter">Letter card (cream)</option>
+        <option value="washi-blue">Blue tape strip</option>
+        <option value="washi-sage">Green tape strip</option>
+        <option value="washi-peach">Peach tape strip</option>
+        <option value="washi-rose">Rose tape strip</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Content</label>
+      <textarea id="f-body" placeholder="The main text…"></textarea>
+      <div class="hint">For tape strips, this shows on hover.</div>
+    </div>
+    <div class="field">
+      <label>Tag <span style="font-weight:400;opacity:0.6">(optional)</span></label>
+      <input type="text" id="f-tag" placeholder="e.g. since 6 jan 2024" />
+    </div>
+    <div class="field">
+      <label>Order</label>
+      <input type="number" id="f-order" placeholder="1, 2, 3…" min="1" />
+      <div class="hint">Lower numbers appear first.</div>
+    </div>
+    <div class="field" style="display:flex;align-items:center;gap:12px">
+      <input type="checkbox" id="f-wide" style="width:auto;accent-color:var(--rose)" />
+      <label for="f-wide" style="text-transform:none;letter-spacing:0;font-size:1rem">Wide card (spans 2 columns)</label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="save-btn">Save</button>
+      <button class="btn btn-ghost" id="cancel-btn">Cancel</button>
+      <button class="btn btn-danger" id="delete-btn" style="margin-left:auto;display:none">Delete</button>
+    </div>
+    <div id="save-error" style="color:#dc2626;margin-top:12px;font-size:1rem;display:none"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const REPO = 'el69420/why-i-love-you';
+const BRANCH = 'main';
+const FOLDER = 'src/content/pages';
+const API = 'https://api.github.com';
+
+let token = '';
+let cards = []; // { filename, title, kind, body, tag, order, wide, sha }
+let editingFilename = null;
+
+// ── Auth ──
+const loginScreen = document.getElementById('login-screen');
+const app = document.getElementById('app');
+
+document.getElementById('login-btn').addEventListener('click', async () => {
+  const t = document.getElementById('token-input').value.trim();
+  if (!t) return;
+  const err = document.getElementById('login-error');
+  err.style.display = 'none';
+  try {
+    const res = await fetch(`${API}/user`, { headers: { Authorization: `token ${t}` } });
+    if (!res.ok) throw new Error('Token invalid or no access');
+    token = t;
+    localStorage.setItem('wily_token', token);
+    showApp();
+  } catch (e) {
+    err.textContent = e.message;
+    err.style.display = 'block';
+  }
+});
+
+document.getElementById('token-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('login-btn').click();
+});
+
+document.getElementById('logout-btn').addEventListener('click', () => {
+  localStorage.removeItem('wily_token');
+  token = '';
+  app.style.display = 'none';
+  loginScreen.style.display = 'flex';
+  document.getElementById('token-input').value = '';
+});
+
+function showApp() {
+  loginScreen.style.display = 'none';
+  app.style.display = 'block';
+  loadCards();
+}
+
+// ── Auto-login ──
+const saved = localStorage.getItem('wily_token');
+if (saved) { token = saved; showApp(); }
+
+// ── Load cards ──
+async function loadCards() {
+  const list = document.getElementById('card-list');
+  list.innerHTML = '<div class="loading">Loading…</div>';
+  try {
+    const res = await ghFetch(`/repos/${REPO}/contents/${FOLDER}?ref=${BRANCH}`);
+    const files = await res.json();
+    const mdFiles = files.filter(f => f.name.endsWith('.md'));
+
+    const loaded = await Promise.all(mdFiles.map(async f => {
+      const r = await ghFetch(`/repos/${REPO}/contents/${f.path}?ref=${BRANCH}`);
+      const data = await r.json();
+      const raw = atob(data.content.replace(/\n/g, ''));
+      return { filename: f.name, sha: data.sha, ...parseFrontmatter(raw) };
+    }));
+
+    cards = loaded.sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
+    renderList();
+  } catch (e) {
+    list.innerHTML = `<div class="loading" style="color:#dc2626">Error: ${e.message}</div>`;
+  }
+}
+
+function renderList() {
+  const list = document.getElementById('card-list');
+  if (!cards.length) {
+    list.innerHTML = '<div class="empty-state">No cards yet. Add one!</div>';
+    return;
+  }
+  list.innerHTML = '';
+  cards.forEach(card => {
+    const row = document.createElement('div');
+    row.className = 'card-row';
+    row.innerHTML = `
+      <span class="kind-badge badge-${card.kind}"></span>
+      <div class="card-row-info">
+        <div class="card-row-title">${esc(card.title)}</div>
+        <div class="card-row-kind">${kindLabel(card.kind)}${card.wide ? ' · wide' : ''}</div>
+      </div>
+      <div class="card-row-actions">
+        <button class="btn btn-ghost btn-sm" data-fn="${esc(card.filename)}">Edit</button>
+      </div>
+    `;
+    row.querySelector('[data-fn]').addEventListener('click', () => openEdit(card.filename));
+    list.appendChild(row);
+  });
+}
+
+// ── Modal ──
+const modal = document.getElementById('modal');
+
+document.getElementById('new-btn').addEventListener('click', () => {
+  editingFilename = null;
+  document.getElementById('modal-title').textContent = 'New card';
+  document.getElementById('f-title').value = '';
+  document.getElementById('f-kind').value = 'sticky-yellow';
+  document.getElementById('f-body').value = '';
+  document.getElementById('f-tag').value = '';
+  document.getElementById('f-order').value = (cards.length + 1).toString();
+  document.getElementById('f-wide').checked = false;
+  document.getElementById('delete-btn').style.display = 'none';
+  document.getElementById('save-error').style.display = 'none';
+  modal.classList.add('open');
+});
+
+function openEdit(filename) {
+  const card = cards.find(c => c.filename === filename);
+  if (!card) return;
+  editingFilename = filename;
+  document.getElementById('modal-title').textContent = 'Edit card';
+  document.getElementById('f-title').value = card.title ?? '';
+  document.getElementById('f-kind').value = card.kind ?? 'sticky-yellow';
+  document.getElementById('f-body').value = card.body ?? '';
+  document.getElementById('f-tag').value = card.tag ?? '';
+  document.getElementById('f-order').value = card.order ?? '';
+  document.getElementById('f-wide').checked = card.wide ?? false;
+  document.getElementById('delete-btn').style.display = 'inline-block';
+  document.getElementById('save-error').style.display = 'none';
+  modal.classList.add('open');
+}
+
+function closeModal() { modal.classList.remove('open'); }
+document.getElementById('cancel-btn').addEventListener('click', closeModal);
+modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+// ── Save ──
+document.getElementById('save-btn').addEventListener('click', async () => {
+  const title = document.getElementById('f-title').value.trim();
+  const kind  = document.getElementById('f-kind').value;
+  const body  = document.getElementById('f-body').value.trim();
+  const tag   = document.getElementById('f-tag').value.trim();
+  const order = parseInt(document.getElementById('f-order').value) || undefined;
+  const wide  = document.getElementById('f-wide').checked;
+  const errEl = document.getElementById('save-error');
+  errEl.style.display = 'none';
+
+  if (!title) { errEl.textContent = 'Title is required'; errEl.style.display = 'block'; return; }
+  if (!body)  { errEl.textContent = 'Content is required'; errEl.style.display = 'block'; return; }
+
+  const content = buildFrontmatter({ title, kind, body, tag: tag || undefined, order, wide: wide || undefined });
+  const filename = editingFilename ?? slugify(title) + '.md';
+  const path = `${FOLDER}/${filename}`;
+  const sha = editingFilename ? cards.find(c => c.filename === editingFilename)?.sha : undefined;
+
+  const saveBtn = document.getElementById('save-btn');
+  saveBtn.textContent = 'Saving…';
+  saveBtn.disabled = true;
+
+  try {
+    await ghFetch(`/repos/${REPO}/contents/${path}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        message: editingFilename ? `Update: ${title}` : `Add: ${title}`,
+        content: btoa(unescape(encodeURIComponent(content))),
+        branch: BRANCH,
+        ...(sha ? { sha } : {}),
+      }),
+    });
+    closeModal();
+    toast('Saved! Site will rebuild in ~1 min.');
+    await loadCards();
+  } catch (e) {
+    errEl.textContent = 'Error saving: ' + e.message;
+    errEl.style.display = 'block';
+  } finally {
+    saveBtn.textContent = 'Save';
+    saveBtn.disabled = false;
+  }
+});
+
+// ── Delete ──
+document.getElementById('delete-btn').addEventListener('click', async () => {
+  if (!editingFilename) return;
+  if (!confirm('Delete this card? This can\'t be undone.')) return;
+  const card = cards.find(c => c.filename === editingFilename);
+  if (!card) return;
+
+  const delBtn = document.getElementById('delete-btn');
+  delBtn.textContent = 'Deleting…';
+  delBtn.disabled = true;
+
+  try {
+    await ghFetch(`/repos/${REPO}/contents/${FOLDER}/${editingFilename}`, {
+      method: 'DELETE',
+      body: JSON.stringify({
+        message: `Delete: ${card.title}`,
+        sha: card.sha,
+        branch: BRANCH,
+      }),
+    });
+    closeModal();
+    toast('Deleted. Site will rebuild in ~1 min.');
+    await loadCards();
+  } catch (e) {
+    document.getElementById('save-error').textContent = 'Error: ' + e.message;
+    document.getElementById('save-error').style.display = 'block';
+  } finally {
+    delBtn.textContent = 'Delete';
+    delBtn.disabled = false;
+  }
+});
+
+// ── Helpers ──
+function ghFetch(path, opts = {}) {
+  return fetch(`${API}${path}`, {
+    ...opts,
+    headers: {
+      Authorization: `token ${token}`,
+      'Content-Type': 'application/json',
+      Accept: 'application/vnd.github+json',
+      ...(opts.headers ?? {}),
+    },
+  }).then(r => {
+    if (!r.ok) return r.json().then(d => { throw new Error(d.message ?? r.statusText); });
+    return r;
+  });
+}
+
+function parseFrontmatter(raw) {
+  const match = raw.match(/^---\n([\s\S]*?)\n---/);
+  if (!match) return {};
+  const fm = {};
+  match[1].split('\n').forEach(line => {
+    const [k, ...v] = line.split(':');
+    if (!k) return;
+    const val = v.join(':').trim().replace(/^"(.*)"$/, '$1');
+    if (val === 'true') fm[k.trim()] = true;
+    else if (val === 'false') fm[k.trim()] = false;
+    else if (!isNaN(val) && val !== '') fm[k.trim()] = Number(val);
+    else fm[k.trim()] = val;
+  });
+  return fm;
+}
+
+function buildFrontmatter({ title, kind, body, tag, order, wide }) {
+  let fm = `---\ntitle: "${title.replace(/"/g, '\\"')}"\nkind: "${kind}"\nbody: "${body.replace(/"/g, '\\"').replace(/\n/g, ' ')}"\n`;
+  if (tag) fm += `tag: "${tag.replace(/"/g, '\\"')}"\n`;
+  if (order) fm += `order: ${order}\n`;
+  if (wide) fm += `wide: true\n`;
+  fm += `---\n`;
+  return fm;
+}
+
+function slugify(str) {
+  return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40)
+    + '-' + Date.now().toString(36);
+}
+
+function kindLabel(kind) {
+  const labels = {
+    'sticky-yellow': 'Yellow sticky', 'sticky-rose': 'Pink sticky',
+    'sticky-blue': 'Blue sticky', 'sticky-sage': 'Green sticky', 'sticky-peach': 'Peach sticky',
+    'note': 'Ruled note', 'letter': 'Letter card',
+    'washi-blue': 'Blue tape', 'washi-sage': 'Green tape', 'washi-peach': 'Peach tape', 'washi-rose': 'Rose tape',
+  };
+  return labels[kind] ?? kind;
+}
+
+function esc(str) {
+  return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3500);
+}
+</script>
+</body>
 </html>
